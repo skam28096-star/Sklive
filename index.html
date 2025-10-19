@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> SSk Channels</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #1a1a1a;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #333;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header .left-section {
+            display: flex;
+            align-items: center;
+        }
+
+        header .left-section h1 {
+            margin: 0;
+            font-size: 1.2em;
+            margin-left: 10px;
+        }
+
+        header .icon {
+            font-size: 1.5em;
+            cursor: pointer;
+            margin-left: 15px;
+            color: #ccc;
+        }
+
+        header .install-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        /* Channels Grid */
+        #channels-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .channel-item {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .channel-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+        }
+
+        .channel-item img {
+            width: 80px; /* Adjust as needed */
+            height: 80px; /* Adjust as needed */
+            object-fit: contain;
+            margin-bottom: 8px;
+            border-radius: 5px; /* If logos are square */
+        }
+
+        .channel-item span {
+            font-size: 0.9em;
+            color: #eee;
+            word-break: break-word;
+        }
+
+        /* Video Player */
+        #video-player-container {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            background-color: #000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        #video-player-header {
+            background-color: #000;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+        }
+
+        #video-player-header .left-section {
+            display: flex;
+            align-items: center;
+        }
+
+        #video-player-header .close-btn {
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #fff;
+            margin-right: 15px;
+        }
+
+        #video-player-header #player-channel-name {
+            margin: 0;
+            font-size: 1.2em;
+            color: #fff;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            /* Maintain aspect ratio - e.g., 16:9 */
+            padding-bottom: 56.25%; /* 9 / 16 * 100 */
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Keep aspect ratio without cropping */
+        }
+
+        .video-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center controls horizontally */
+            padding: 15px 20px;
+            background-color: #1a1a1a;
+            border-top: 1px solid #333;
+            width: 100%; /* Ensure controls span full width */
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .video-controls button,
+        .video-controls input[type="range"] {
+            margin: 0 10px;
+        }
+
+        .video-controls button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .video-controls input[type="range"] {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            background: #555;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .video-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+
+        .video-controls .time-display {
+            font-size: 0.9em;
+            color: #ccc;
+            min-width: 80px; /* Ensure space for time */
+            text-align: center;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            #channels-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .channel-item img {
+                width: 70px;
+                height: 70px;
+            }
+
+            .channel-item span {
+                font-size: 0.8em;
+            }
+
+            header, #video-player-header {
+                padding: 8px 15px;
+            }
+            header h1, #player-channel-name {
+                font-size: 1em;
+            }
+            .video-controls {
+                flex-wrap: wrap; /* Allow controls to wrap on smaller screens */
+                justify-content: space-around;
+            }
+            .video-controls button, .video-controls .time-display {
+                margin: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <div class="left-section">
+            <span class="icon">&larr;</span> <h1>SSK_Channels</h1>
+        </div>
+        <div class="right-section">
+            <span class="icon">&#9733;</span> <span class="icon">&#128269;</span> </div>
+    </header>
+
+    <div id="channels-container">
+        </div>
+
+    <div id="video-player-container">
+        <header id="video-player-header">
+            <div class="left-section">
+                <span class="close-btn" onclick="hidePlayer()">&times;</span> <h1 id="player-channel-name">Disney Channel</h1>
+            </div>
+            <span class="icon">&#128274;</span> </header>
+
+        <div class="video-wrapper">
+            <video id="video-player" controls autoplay playsinline>
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <div class="video-controls">
+            <span class="time-display" id="current-time">00:00</span>
+            <input type="range" id="progress-bar" value="0" step="0.1">
+            <span class="time-display" id="duration">00:00</span>
+            <button id="play-pause-btn">&#9658;</button> <button id="fullscreen-btn">&#x26F6;</button> <button id="settings-btn">&#9881;</button> </div>
+    </div>
+
+    <script>
+        // Sample M3U-like playlist data
+        const channels = [
+            { name: "Gubbbare", logo: "https://i.ibb.co/pBhs5dQh/images-8.jpg", streamUrl: "https://epiconvh.akamaized.net/live/gubbare/master_480.m3u8" },
+            { name: "DD Sports", logo: "https://i.ibb.co/q3k3VVms/images-9.jpg", streamUrl: "https://cdn-6.pishow.tv/live/13/13_2.m3u8" },
+            { name: "Mastii", logo: "https://i.ibb.co/hJbfmvgh/images-11.jpg", streamUrl: "https://sabliveyupp.akamaized.net/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/sablive_https/e4cf1919-1eb4-413f-a1f2-cc2eb2df6b89/1.m3u8" },
+            { name: "NDTV News", logo: "https://i.ibb.co/XMwrgDN/images-12.jpg", streamUrl: "https://ndtv24x7elemarchana.akamaized.net/hls/live/2003678-b/ndtv24x7/masterb_720p@3.m3u8" },
+            { name: "starsportshin", logo: "https://i.ibb.co/PZz7tJfn/images-6.jpg", streamUrl:"https://live-ak.vimeocdn.com/exp=1760847682~acl=%2F556e4ebb-fb73-4dfd-a780-94de1b8c761a_fmp4%2F%2A~hmac=b7f8eca59b9148081c84c791706b21f640cd44906fa72255ae5950bb923e0b16/556e4ebb-fb73-4dfd-a780-94de1b8c761a_fmp4/avc/240p/chunklist.m3u8" },
+        ];
+       
+       
+   
+      const channelsContainer = document.getElementById('channels-container');
+        const mainHeader = document.getElementById('main-header');
+        const videoPlayerContainer = document.getElementById('video-player-container');
+        const videoPlayer = document.getElementById('video-player');
+        const playerChannelName = document.getElementById('player-channel-name');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const durationDisplay = document.getElementById('duration');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        function loadChannels() {
+            channelsContainer.innerHTML = ''; // Clear existing channels
+            channels.forEach(channel => {
+                const channelItem = document.createElement('div');
+                channelItem.classList.add('channel-item');
+                channelItem.innerHTML = `
+                    <img src="${channel.logo}" alt="${channel.name} Logo">
+                    <span>${channel.name}</span>
+                `;
+                channelItem.addEventListener('click', () => playChannel(channel.streamUrl, channel.name));
+                channelsContainer.appendChild(channelItem);
+            });
+        }
+
+        function playChannel(streamUrl, channelName) {
+            mainHeader.style.display = 'none';
+            channelsContainer.style.display = 'none';
+            videoPlayerContainer.style.display = 'flex'; // Show the player
+            playerChannelName.textContent = channelName;
+            videoPlayer.src = streamUrl;
+            videoPlayer.load(); // Load the new video source
+            videoPlayer.play();
+            playPauseBtn.innerHTML = '&#10074;&#10074;'; // Pause icon
+        }
+
+        function hidePlayer() {
+            videoPlayer.pause();
+            videoPlayerContainer.style.display = 'none'; // Hide the player
+            mainHeader.style.display = 'flex';
+            channelsContainer.style.display = 'grid'; // Show channels again
+        }
+
+        // Video Player Controls Logic
+        playPauseBtn.addEventListener('click', () => {
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                playPauseBtn.innerHTML = '&#10074;&#10074;'; // Pause icon
+            } else {
+                videoPlayer.pause();
+                playPauseBtn.innerHTML = '&#9658;'; // Play icon
+            }
+        });
+
+        videoPlayer.addEventListener('timeupdate', () => {
+            const currentTime = videoPlayer.currentTime;
+            const duration = videoPlayer.duration;
+            currentTimeDisplay.textContent = formatTime(currentTime);
+            if (!isNaN(duration)) {
+                progressBar.value = (currentTime / duration) * 100;
+            }
+        });
+
+        videoPlayer.addEventListener('loadedmetadata', () => {
+            durationDisplay.textContent = formatTime(videoPlayer.duration);
+            progressBar.max = 100; // Set max for percentage
+        });
+
+        progressBar.addEventListener('input', () => {
+            const seekTime = (progressBar.value / 100) * videoPlayer.duration;
+            videoPlayer.currentTime = seekTime;
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (videoPlayer.requestFullscreen) {
+                videoPlayer.requestFullscreen();
+            } else if (videoPlayer.mozRequestFullScreen) { /* Firefox */
+                videoPlayer.mozRequestFullScreen();
+            } else if (videoPlayer.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                videoPlayer.webkitRequestFullscreen();
+            } else if (videoPlayer.msRequestFullscreen) { /* IE/Edge */
+                videoPlayer.msRequestFullscreen();
+            }
+        });
+
+        // Initialize channels on page load
+        document.addEventListener('DOMContentLoaded', loadChannels);
+    </script>
+</body>
+</html>
